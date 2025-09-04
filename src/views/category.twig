@@ -1,0 +1,135 @@
+<!-- src/views/category.twig -->
+{% extends "layouts/main.twig" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <!-- Cabeçalho da categoria -->
+        <div class="mb-4">
+            <h1>{{ categoria.nome }}</h1>
+            {% if categoria.descricao %}
+                <p class="lead">{{ categoria.descricao }}</p>
+            {% endif %}
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Início</a></li>
+                    <li class="breadcrumb-item active">{{ categoria.nome }}</li>
+                </ol>
+            </nav>
+        </div>
+
+        {% if posts is empty %}
+            <div class="alert alert-info text-center">
+                <h4>Nenhum post nesta categoria</h4>
+                <p>Ainda não há posts publicados na categoria "{{ categoria.nome }}".</p>
+                <a href="/create/post" class="btn btn-primary">Criar Post</a>
+            </div>
+        {% else %}
+            <!-- Informações da paginação -->
+            <div class="mb-3 text-muted">
+                {{ pagination.total }} post{% if pagination.total != 1 %}s{% endif %} 
+                em "{{ categoria.nome }}"
+                {% if pagination.total > pagination.limit %}
+                    (página {{ pagination.currentPage }} de {{ pagination.totalPages }})
+                {% endif %}
+            </div>
+
+            <!-- Lista de posts -->
+            {% for post in posts %}
+                <article class="card mb-4">
+                    <div class="card-body">
+                        <h3 class="card-title">
+                            <a href="/post/{{ post.slug }}" class="text-decoration-none">
+                                {{ post.titulo }}
+                            </a>
+                        </h3>
+                        
+                        <div class="post-meta mb-3">
+                            Por <strong>{{ post.autor.nome }}</strong>
+                            • {{ post.criadoEm | date("d/m/Y H:i") }}
+                        </div>
+                        
+                        <p class="card-text">{{ post.excerpt }}</p>
+                        
+                        {% if post.tags is not empty %}
+                            <div class="mb-2">
+                                {% for tag in post.tags %}
+                                    <span class="tag">{{ tag.nome }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        
+                        <a href="/post/{{ post.slug }}" class="btn btn-primary">Ler mais</a>
+                    </div>
+                </article>
+            {% endfor %}
+
+            <!-- Paginação -->
+            {% if pagination.totalPages > 1 %}
+                <nav aria-label="Paginação da categoria">
+                    <ul class="pagination justify-content-center">
+                        <!-- Página anterior -->
+                        {% if pagination.hasPrevPage %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ pagination.prevPage }}">Anterior</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">Anterior</span>
+                            </li>
+                        {% endif %}
+
+                        <!-- Números das páginas -->
+                        {% set startPage = max(1, pagination.currentPage - 2) %}
+                        {% set endPage = min(pagination.totalPages, pagination.currentPage + 2) %}
+
+                        {% for page in startPage..endPage %}
+                            {% if page == pagination.currentPage %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ page }}</span>
+                                </li>
+                            {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page }}">{{ page }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        <!-- Próxima página -->
+                        {% if pagination.hasNextPage %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ pagination.nextPage }}">Próxima</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">Próxima</span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-md-4">
+        <div class="sidebar">
+            <h5>Sobre esta categoria</h5>
+            <h6>{{ categoria.nome }}</h6>
+            {% if categoria.descricao %}
+                <p>{{ categoria.descricao }}</p>
+            {% endif %}
+            <p class="text-muted">{{ pagination.total }} post{% if pagination.total != 1 %}s{% endif %} publicado{% if pagination.total != 1 %}s{% endif %}</p>
+        </div>
+
+        <div class="sidebar">
+            <h5>Navegação</h5>
+            <ul class="list-unstyled">
+                <li><a href="/" class="text-decoration-none">🏠 Página Inicial</a></li>
+                <li><a href="/posts" class="text-decoration-none">📰 Todos os Posts</a></li>
+                <li><a href="/create/post" class="text-decoration-none">✍️ Novo Post</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

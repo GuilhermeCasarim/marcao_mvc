@@ -1,0 +1,167 @@
+<!-- src/views/create-post.twig -->
+{% extends "layouts/main.twig" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h2>Criar Novo Post</h2>
+            </div>
+            <div class="card-body">
+                <!-- Exibir erros se houver -->
+                {% if errors is defined and errors is not empty %}
+                    <div class="alert alert-danger">
+                        <h6>Erros encontrados:</h6>
+                        <ul class="mb-0">
+                            {% for error in errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <form method="POST" action="/create/post">
+                    <!-- Título -->
+                    <div class="mb-3">
+                        <label for="titulo" class="form-label">Título *</label>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="titulo" 
+                            name="titulo" 
+                            value="{{ formData.titulo | default('') }}" 
+                            required
+                            maxlength="255"
+                        >
+                        <div class="form-text">O título será usado para gerar a URL do post</div>
+                    </div>
+
+                    <!-- Conteúdo -->
+                    <div class="mb-3">
+                        <label for="conteudo" class="form-label">Conteúdo *</label>
+                        <textarea 
+                            class="form-control" 
+                            id="conteudo" 
+                            name="conteudo" 
+                            rows="12" 
+                            required
+                        >{{ formData.conteudo | default('') }}</textarea>
+                        <div class="form-text">Use HTML básico para formatação</div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Autor -->
+                        <div class="col-md-6 mb-3">
+                            <label for="autorId" class="form-label">Autor *</label>
+                            <select class="form-select" id="autorId" name="autorId" required>
+                                <option value="">Selecione um autor</option>
+                                {% for autor in autores %}
+                                    <option 
+                                        value="{{ autor.id }}" 
+                                        {% if formData.autorId == autor.id %}selected{% endif %}
+                                    >
+                                        {{ autor.nome }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Categoria -->
+                        <div class="col-md-6 mb-3">
+                            <label for="categoriaId" class="form-label">Categoria *</label>
+                            <select class="form-select" id="categoriaId" name="categoriaId" required>
+                                <option value="">Selecione uma categoria</option>
+                                {% for categoria in categorias %}
+                                    <option 
+                                        value="{{ categoria.id }}" 
+                                        {% if formData.categoriaId == categoria.id %}selected{% endif %}
+                                    >
+                                        {{ categoria.nome }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Tags -->
+                    <div class="mb-3">
+                        <label for="tags" class="form-label">Tags</label>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="tags" 
+                            name="tags" 
+                            value="{{ formData.tags | default('') }}" 
+                            placeholder="Digite as tags separadas por vírgula"
+                        >
+                        <div class="form-text">
+                            Digite as tags separadas por vírgula. Ex: javascript, web, tutorial
+                        </div>
+                    </div>
+
+                    <!-- Publicar -->
+                    <div class="mb-4">
+                        <div class="form-check">
+                            <input 
+                                class="form-check-input" 
+                                type="checkbox" 
+                                id="publicado" 
+                                name="publicado"
+                                {% if formData.publicado %}checked{% endif %}
+                            >
+                            <label class="form-check-label" for="publicado">
+                                Publicar imediatamente
+                            </label>
+                        </div>
+                        <div class="form-text">
+                            Se não marcado, o post ficará como rascunho
+                        </div>
+                    </div>
+
+                    <!-- Botões -->
+                    <div class="d-flex justify-content-between">
+                        <a href="/" class="btn btn-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">Criar Post</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Links úteis -->
+        <div class="mt-4">
+            <div class="card">
+                <div class="card-body">
+                    <h6>Não encontrou o que precisa?</h6>
+                    <div class="d-flex gap-2">
+                        <a href="/create/author" class="btn btn-outline-info btn-sm">Novo Autor</a>
+                        <a href="/create/category" class="btn btn-outline-success btn-sm">Nova Categoria</a>
+                        <a href="/create/tag" class="btn btn-outline-warning btn-sm">Nova Tag</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Contador de caracteres para o título
+document.getElementById('titulo').addEventListener('input', function() {
+    const maxLength = this.maxLength;
+    const currentLength = this.value.length;
+    const remaining = maxLength - currentLength;
+    
+    // Criar ou atualizar contador se não existir
+    let counter = document.getElementById('titulo-counter');
+    if (!counter) {
+        counter = document.createElement('div');
+        counter.id = 'titulo-counter';
+        counter.className = 'form-text text-end';
+        this.parentNode.appendChild(counter);
+    }
+    
+    counter.textContent = `${remaining} caracteres restantes`;
+    counter.className = remaining < 20 ? 'form-text text-end text-warning' : 'form-text text-end';
+});
+</script>
+{% endblock %}

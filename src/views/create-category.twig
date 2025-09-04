@@ -1,0 +1,107 @@
+<!-- src/views/create-category.twig -->
+{% extends "layouts/main.twig" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h2>Criar Nova Categoria</h2>
+            </div>
+            <div class="card-body">
+                <!-- Exibir erros se houver -->
+                {% if errors is defined and errors is not empty %}
+                    <div class="alert alert-danger">
+                        <h6>Erros encontrados:</h6>
+                        <ul class="mb-0">
+                            {% for error in errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <form method="POST" action="/create/category">
+                    <!-- Nome -->
+                    <div class="mb-3">
+                        <label for="nome" class="form-label">Nome da Categoria *</label>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="nome" 
+                            name="nome" 
+                            value="{{ formData.nome | default('') }}" 
+                            required
+                            maxlength="100"
+                        >
+                        <div class="form-text">O nome será usado para gerar a URL da categoria</div>
+                    </div>
+
+                    <!-- Descrição -->
+                    <div class="mb-4">
+                        <label for="descricao" class="form-label">Descrição</label>
+                        <textarea 
+                            class="form-control" 
+                            id="descricao" 
+                            name="descricao" 
+                            rows="4"
+                            maxlength="500"
+                        >{{ formData.descricao | default('') }}</textarea>
+                        <div class="form-text">Uma breve descrição sobre esta categoria (opcional)</div>
+                    </div>
+
+                    <!-- Botões -->
+                    <div class="d-flex justify-content-between">
+                        <a href="/" class="btn btn-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-success">Criar Categoria</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Dicas -->
+        <div class="mt-4">
+            <div class="card border-info">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0">💡 Dicas para Categorias</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0 small">
+                        <li>Use nomes descritivos e únicos</li>
+                        <li>Mantenha os nomes curtos e objetivos</li>
+                        <li>Evite caracteres especiais no nome</li>
+                        <li>A URL será gerada automaticamente</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Contador de caracteres
+document.getElementById('nome').addEventListener('input', function() {
+    updateCharacterCounter(this, 'nome-counter', 100);
+});
+
+document.getElementById('descricao').addEventListener('input', function() {
+    updateCharacterCounter(this, 'descricao-counter', 500);
+});
+
+function updateCharacterCounter(element, counterId, maxLength) {
+    const currentLength = element.value.length;
+    const remaining = maxLength - currentLength;
+    
+    let counter = document.getElementById(counterId);
+    if (!counter) {
+        counter = document.createElement('div');
+        counter.id = counterId;
+        counter.className = 'form-text text-end';
+        element.parentNode.appendChild(counter);
+    }
+    
+    counter.textContent = `${remaining} caracteres restantes`;
+    counter.className = remaining < 20 ? 'form-text text-end text-warning' : 'form-text text-end';
+}
+</script>
+{% endblock %}

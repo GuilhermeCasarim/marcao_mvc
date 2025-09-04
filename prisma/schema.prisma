@@ -1,0 +1,69 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Autor {
+  id    Int    @id @default(autoincrement())
+  nome  String
+  email String @unique
+  bio   String?
+  posts Post[]
+
+  @@map("autores")
+}
+
+model Categoria {
+  id        Int    @id @default(autoincrement())
+  nome      String @unique
+  descricao String?
+  slug      String @unique
+  posts     Post[]
+
+  @@map("categorias")
+}
+
+model Tag {
+  id    Int       @id @default(autoincrement())
+  nome  String    @unique
+  slug  String    @unique
+  posts PostTag[]
+
+  @@map("tags")
+}
+
+model Post {
+  id          Int       @id @default(autoincrement())
+  titulo      String
+  conteudo    String
+  slug        String    @unique
+  publicado   Boolean   @default(false)
+  criadoEm    DateTime  @default(now())
+  atualizadoEm DateTime @updatedAt
+  autorId     Int
+  categoriaId Int
+  
+  autor     Autor     @relation(fields: [autorId], references: [id])
+  categoria Categoria @relation(fields: [categoriaId], references: [id])
+  tags      PostTag[]
+
+  @@map("posts")
+}
+
+model PostTag {
+  postId Int
+  tagId  Int
+  
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([postId, tagId])
+  @@map("post_tags")
+}

@@ -1,0 +1,130 @@
+<!-- src/views/create-tag.twig -->
+{% extends "layouts/main.twig" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h2>Criar Nova Tag</h2>
+            </div>
+            <div class="card-body">
+                <!-- Exibir erros se houver -->
+                {% if errors is defined and errors is not empty %}
+                    <div class="alert alert-danger">
+                        <h6>Erros encontrados:</h6>
+                        <ul class="mb-0">
+                            {% for error in errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <form method="POST" action="/create/tag">
+                    <!-- Nome -->
+                    <div class="mb-4">
+                        <label for="nome" class="form-label">Nome da Tag *</label>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="nome" 
+                            name="nome" 
+                            value="{{ formData.nome | default('') }}" 
+                            required
+                            maxlength="50"
+                            placeholder="Ex: javascript, tutorial, programação"
+                        >
+                        <div class="form-text">Use nomes curtos e descritivos. A URL será gerada automaticamente.</div>
+                    </div>
+
+                    <!-- Botões -->
+                    <div class="d-flex justify-content-between">
+                        <a href="/" class="btn btn-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-warning">Criar Tag</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Informações -->
+        <div class="mt-4">
+            <div class="card border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h6 class="mb-0">🏷️ Sobre as Tags</h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2">Tags ajudam a categorizar e organizar o conteúdo dos posts.</p>
+                    
+                    <h6>Exemplos de boas tags:</h6>
+                    <ul class="small">
+                        <li><strong>Tecnologia:</strong> javascript, python, react, nodejs</li>
+                        <li><strong>Categoria:</strong> tutorial, dicas, review, notícias</li>
+                        <li><strong>Nível:</strong> iniciante, avançado, intermediário</li>
+                        <li><strong>Tipo:</strong> frontend, backend, mobile, web</li>
+                    </ul>
+                    
+                    <div class="alert alert-info mt-3">
+                        <small>
+                            <strong>💡 Dica:</strong> Tags também são criadas automaticamente 
+                            quando você digita no campo de tags ao criar um post.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Link para criar post -->
+        <div class="mt-3 text-center">
+            <a href="/create/post" class="btn btn-outline-primary">
+                ✍️ Criar Post com esta Tag
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+// Contador de caracteres para a tag
+document.getElementById('nome').addEventListener('input', function() {
+    const maxLength = this.maxLength;
+    const currentLength = this.value.length;
+    const remaining = maxLength - currentLength;
+    
+    let counter = document.getElementById('nome-counter');
+    if (!counter) {
+        counter = document.createElement('div');
+        counter.id = 'nome-counter';
+        counter.className = 'form-text text-end';
+        this.parentNode.appendChild(counter);
+    }
+    
+    counter.textContent = `${remaining} caracteres restantes`;
+    counter.className = remaining < 10 ? 'form-text text-end text-warning' : 'form-text text-end';
+});
+
+// Preview do slug
+document.getElementById('nome').addEventListener('input', function() {
+    const nome = this.value;
+    const slug = nome
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9\s-]/g, '')
+        .trim()
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-');
+    
+    let preview = document.getElementById('slug-preview');
+    if (!preview && slug) {
+        preview = document.createElement('div');
+        preview.id = 'slug-preview';
+        preview.className = 'form-text text-muted';
+        this.parentNode.appendChild(preview);
+    }
+    
+    if (preview) {
+        preview.innerHTML = slug ? `<strong>URL:</strong> /tag/${slug}` : '';
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,103 @@
+<!-- src/views/index.twig -->
+{% extends "layouts/main.twig" %}
+
+{% block content %}
+<div class="row">
+    <!-- Posts principais -->
+    <div class="col-md-8">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Posts Recentes</h1>
+            <a href="/posts" class="btn btn-outline-primary">Ver todos</a>
+        </div>
+
+        {% if posts is empty %}
+            <div class="alert alert-info">
+                <h4>Nenhum post encontrado</h4>
+                <p>Seja o primeiro a criar um post!</p>
+                <a href="/create/post" class="btn btn-primary">Criar Post</a>
+            </div>
+        {% else %}
+            <div class="row">
+                {% for post in posts %}
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <a href="/post/{{ post.slug }}" class="text-decoration-none">
+                                        {{ post.titulo }}
+                                    </a>
+                                </h5>
+                                
+                                <div class="post-meta mb-2">
+                                    Por <strong>{{ post.autor.nome }}</strong> 
+                                    em <a href="/category/{{ post.categoria.slug }}" class="text-decoration-none">{{ post.categoria.nome }}</a>
+                                    <br>
+                                    <small>{{ post.criadoEm | date("d/m/Y H:i") }}</small>
+                                </div>
+                                
+                                <p class="card-text">{{ post.excerpt }}</p>
+                                
+                                {% if post.tags is not empty %}
+                                    <div class="mb-2">
+                                        {% for tag in post.tags %}
+                                            <span class="tag">{{ tag.nome }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                
+                                <a href="/post/{{ post.slug }}" class="btn btn-primary btn-sm">Ler mais</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-md-4">
+        <!-- Categorias -->
+        {% if categorias is not empty %}
+            <div class="sidebar">
+                <h5>Categorias</h5>
+                <ul class="list-unstyled">
+                    {% for categoria in categorias %}
+                        <li class="mb-2">
+                            <a href="/category/{{ categoria.slug }}" class="text-decoration-none">
+                                {{ categoria.nome }}
+                                <span class="badge bg-secondary">{{ categoria.postsCount }}</span>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <!-- Tags populares -->
+        {% if tags is not empty %}
+            <div class="sidebar">
+                <h5>Tags Populares</h5>
+                <div>
+                    {% for tag in tags %}
+                        {% if tag.postsCount > 0 %}
+                            <span class="tag">
+                                {{ tag.nome }} ({{ tag.postsCount }})
+                            </span>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Links úteis -->
+        <div class="sidebar">
+            <h5>Links Úteis</h5>
+            <ul class="list-unstyled">
+                <li><a href="/create/post" class="text-decoration-none">✍️ Escrever Post</a></li>
+                <li><a href="/create/category" class="text-decoration-none">📁 Nova Categoria</a></li>
+                <li><a href="/create/tag" class="text-decoration-none">🏷️ Nova Tag</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
